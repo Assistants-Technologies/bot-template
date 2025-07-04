@@ -1,8 +1,13 @@
+/* eslint-disable no-console */
 import { dirname, resolve } from "@discordx/importer";
 import chokidar from "chokidar";
 import { DIService, MetadataStorage } from "discordx";
+import { config } from "dotenv";
 
 import { bot } from "./bot.js";
+
+// Load environment variables from .env file
+config();
 
 // The following syntax should be used in the commonjs environment
 // const importPattern =  __dirname + "/{events,commands}/**/*.{ts,js}"
@@ -60,12 +65,12 @@ async function run() {
   await LoadFiles(importPattern);
 
   // Let's start the bot
-  if (!process.env.BOT_TOKEN) {
-    throw Error("Could not find BOT_TOKEN in your environment");
+  if (!process.env.DISCORD_TOKEN) {
+    throw Error("Could not find DISCORD_TOKEN in your environment");
   }
 
   // Log in with your bot token
-  await bot.login(process.env.BOT_TOKEN);
+  await bot.login(process.env.DISCORD_TOKEN);
 
   // Hot Module reload
   if (process.env.NODE_ENV !== "production") {
