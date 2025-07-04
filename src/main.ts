@@ -2,11 +2,15 @@ import { dirname, importx } from "@discordx/importer";
 import { config } from "dotenv";
 
 import { bot } from "./bot.js";
+import { setupGlobalErrorHandlers, errorHandler } from "./utils/errorHandler.js";
 
 // Load environment variables from .env file
 config();
 
 async function run() {
+  // Setup global error handlers
+  setupGlobalErrorHandlers();
+
   // The following syntax should be used in the commonjs environment
   //
   // await importx(__dirname + "/{events,commands}/**/*.{ts,js}");
@@ -21,6 +25,9 @@ async function run() {
 
   // Log in with your bot token
   await bot.login(process.env.DISCORD_TOKEN);
+  
+  // Set the client for error reporting
+  errorHandler.setClient(bot);
 }
 
 void run();

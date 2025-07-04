@@ -1,6 +1,7 @@
-import type { Interaction, Message } from "discord.js";
+import type { CommandInteraction, Interaction, Message } from "discord.js";
 import { IntentsBitField } from "discord.js";
 import { Client } from "discordx";
+import { errorHandler } from "./utils/errorHandler.js";
 
 export const bot = new Client({
   // To use only guild command
@@ -17,7 +18,7 @@ export const bot = new Client({
   ],
 
   // Debug logs are disabled in silent mode
-  silent: false,
+  silent: true,
 
   // Configuration for @SimpleCommand
   simpleCommand: {
@@ -43,10 +44,29 @@ bot.once("ready", async () => {
   console.log("Bot started");
 });
 
-bot.on("interactionCreate", (interaction: Interaction) => {
-  bot.executeInteraction(interaction);
+bot.on("interactionCreate", async (interaction: Interaction) => {
+  try {
+    await bot.executeInteraction(interaction);
+  } catch (error) {
+    await errorHandler.handleError(error as Error, interaction as CommandInteraction, {
+      command: "interaction",
+      userId: interaction.user?.id,
+      guildId: interaction.guildId || undefined,
+      channelId: interaction.channelId,
+    });
+  }
 });
 
-bot.on("messageCreate", (message: Message) => {
-  void bot.executeCommand(message);
+bot.on("messageCreate", async (message: Message) => {
+  try {
+    await bot.executeCommand(message);
+  } catch (error) {
+    const guildId = message.guildId !== null ? message.guildId : undefined;
+    await errorHandler.handleError(error as Error, undefined, {
+      command: "message",
+      userId: message.author.id,
+      guildId: guildId as string | undefined,
+      channelId: message.channelId,
+    });
+  }
 });

@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
 import { dirname, resolve } from "@discordx/importer";
 import chokidar from "chokidar";
 import { DIService, MetadataStorage } from "discordx";
 import { config } from "dotenv";
 
 import { bot } from "./bot.js";
+import { errorHandler } from "./utils/errorHandler.js";
 
 // Load environment variables from .env file
 config();
@@ -71,13 +71,12 @@ async function run() {
 
   // Log in with your bot token
   await bot.login(process.env.DISCORD_TOKEN);
+  
+  // Set the client for error reporting
+  errorHandler.setClient(bot);
 
   // Hot Module reload
   if (process.env.NODE_ENV !== "production") {
-    console.log(
-      "> Hot-Module-Reload enabled in development. Commands will automatically reload.",
-    );
-
     // Watch changed files using chikidar
     watcher.on("add", () => void Reload());
     watcher.on("change", () => void Reload());
