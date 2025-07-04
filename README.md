@@ -38,27 +38,27 @@
 
 # 📖 Introduction
 
-A blank template with one command and one event, This is a useful template if you want to quickly spin up a project.
+This project uses discordx and Discord.js to create a template for all future AT bots.
 
 # 🏗 Development
 
 ```
-npm install
-npm run dev
+yarn install
+yarn dev
 ```
 
 If you want to use [Nodemon](https://nodemon.io/) to auto-reload while in development:
 
 ```
-npm run watch
+yarn watch
 ```
 
 # 💻 Production
 
 ```
-npm install --production
-npm run build
-npm run start
+yarn install --production
+yarn build
+yarn start
 ```
 
 # 🐋 Docker
