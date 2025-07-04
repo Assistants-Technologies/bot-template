@@ -29,8 +29,7 @@ export default [
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-inferrable-types": "off",
       "prefer-const": "error",
-      "no-var": "error",
-      "no-console": "warn"
+      "no-var": "error"
     }
   },
   {
