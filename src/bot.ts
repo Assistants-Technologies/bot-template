@@ -1,7 +1,7 @@
-import type { CommandInteraction, Interaction, Message } from "discord.js";
-import { IntentsBitField } from "discord.js";
-import { Client } from "discordx";
-import { errorHandler } from "./utils/errorHandler.js";
+import type { CommandInteraction, Interaction, Message } from 'discord.js';
+import { IntentsBitField } from 'discord.js';
+import { Client } from 'discordx';
+import { errorHandler } from './utils/errorHandler.js';
 
 export const bot = new Client({
   // To use only guild command
@@ -22,11 +22,11 @@ export const bot = new Client({
 
   // Configuration for @SimpleCommand
   simpleCommand: {
-    prefix: "!",
+    prefix: '!',
   },
 });
 
-bot.once("ready", async () => {
+bot.once('ready', async () => {
   // Make sure all guilds are cached
   // await bot.guilds.fetch();
 
@@ -41,15 +41,15 @@ bot.once("ready", async () => {
   //    ...bot.guilds.cache.map((g) => g.id)
   //  );
 
-  console.log("Bot started");
+  console.log('Bot started');
 });
 
-bot.on("interactionCreate", async (interaction: Interaction) => {
+bot.on('interactionCreate', async (interaction: Interaction) => {
   try {
     await bot.executeInteraction(interaction);
   } catch (error) {
     await errorHandler.handleError(error as Error, interaction as CommandInteraction, {
-      command: "interaction",
+      command: 'interaction',
       userId: interaction.user?.id,
       guildId: interaction.guildId || undefined,
       channelId: interaction.channelId,
@@ -57,13 +57,13 @@ bot.on("interactionCreate", async (interaction: Interaction) => {
   }
 });
 
-bot.on("messageCreate", async (message: Message) => {
+bot.on('messageCreate', async (message: Message) => {
   try {
     await bot.executeCommand(message);
   } catch (error) {
     const guildId = message.guildId !== null ? message.guildId : undefined;
     await errorHandler.handleError(error as Error, undefined, {
-      command: "message",
+      command: 'message',
       userId: message.author.id,
       guildId: guildId as string | undefined,
       channelId: message.channelId,

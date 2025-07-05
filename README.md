@@ -112,6 +112,7 @@ A Discord bot template built with [discordx](https://discordx.js.org) and TypeSc
 - 🗄️ **Database** - Prisma ORM with PostgreSQL
 - 🛡️ **Error Handling** - Comprehensive error handling and anti-crash system
 - 📊 **Error Logging** - Optional Discord channel error reporting
+- 🧹 **Biome** - Fast linting, formatting, and import organization
 
 ## Environment Variables
 
@@ -187,9 +188,11 @@ docker-compose up --build
 - `yarn watch` - Watch for file changes
 - `yarn build` - Build the project
 - `yarn start` - Start production server
-- `yarn lint` - Run ESLint
-- `yarn lint:fix` - Fix ESLint errors
-- `yarn lint:watch` - Watch for linting errors
+- `yarn lint` - Run Biome linting
+- `yarn lint:fix` - Fix Biome linting errors
+- `yarn format` - Format code with Biome
+- `yarn format:fix` - Format and write changes
+- `yarn biome:fix` - Run both linting and formatting fixes
 
 ## Project Structure
 
@@ -216,12 +219,22 @@ The bot includes a comprehensive error handling system that:
 - Implements rate limiting to prevent spam
 - Handles database operation errors safely
 
+## Code Quality
+
+This project uses **Biome** for code quality:
+
+- **Fast linting** - Built in Rust for speed
+- **Formatting** - Consistent code style
+- **Import organization** - Automatic import sorting
+- **TypeScript support** - Full TypeScript integration
+- **Decorator support** - Works with Discord.js decorators
+
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run tests and linting
+4. Run `yarn biome:fix` to format and lint
 5. Submit a pull request
 
 ## License

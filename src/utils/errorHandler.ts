@@ -1,14 +1,14 @@
-import type { CommandInteraction, Interaction, Message, Client, TextChannel } from "discord.js";
-import { EmbedBuilder } from "discord.js";
+import type { Client, CommandInteraction, Interaction, Message, TextChannel } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 
 /**
  * Error severity levels
  */
 export enum ErrorSeverity {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM", 
-  HIGH = "HIGH",
-  CRITICAL = "CRITICAL"
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
 }
 
 /**
@@ -39,7 +39,7 @@ export class BotError extends Error {
     cause?: Error
   ) {
     super(message);
-    this.name = "BotError";
+    this.name = 'BotError';
     this.severity = severity;
     this.context = context;
     this.timestamp = new Date();
@@ -77,12 +77,10 @@ export class ErrorHandler {
     interaction?: CommandInteraction,
     context?: ErrorContext
   ): Promise<void> {
-    const botError = error instanceof BotError ? error : new BotError(
-      error.message,
-      ErrorSeverity.MEDIUM,
-      context || {},
-      error
-    );
+    const botError =
+      error instanceof BotError
+        ? error
+        : new BotError(error.message, ErrorSeverity.MEDIUM, context || {}, error);
 
     // Log the error
     this.logError(botError);
@@ -94,7 +92,7 @@ export class ErrorHandler {
 
     // Check if we're hitting error rate limits
     if (this.isErrorRateLimited(botError)) {
-      console.warn("Error rate limit exceeded, skipping user notification");
+      console.warn('Error rate limit exceeded, skipping user notification');
       return;
     }
 
@@ -108,12 +106,10 @@ export class ErrorHandler {
    * Handle unhandled promise rejections
    */
   public handleUnhandledRejection(reason: unknown, promise: Promise<unknown>): void {
-    const error = new BotError(
-      "Unhandled Promise Rejection",
-      ErrorSeverity.CRITICAL,
-      { additionalData: { reason: String(reason), promise: String(promise) } }
-    );
-    
+    const error = new BotError('Unhandled Promise Rejection', ErrorSeverity.CRITICAL, {
+      additionalData: { reason: String(reason), promise: String(promise) },
+    });
+
     this.logError(error);
   }
 
@@ -122,17 +118,17 @@ export class ErrorHandler {
    */
   public handleUncaughtException(error: Error): void {
     const botError = new BotError(
-      "Uncaught Exception",
+      'Uncaught Exception',
       ErrorSeverity.CRITICAL,
       { additionalData: { originalError: error.message } },
       error
     );
-    
+
     this.logError(botError);
-    
+
     // Give time for logging before exit
     setTimeout(() => {
-      console.error("Critical error occurred, shutting down gracefully...");
+      console.error('Critical error occurred, shutting down gracefully...');
       process.exit(1);
     }, 1000);
   }
@@ -144,9 +140,9 @@ export class ErrorHandler {
     const timestamp = error.timestamp.toISOString();
     const severity = error.severity;
     const context = error.context;
-    
+
     console.error(`[${timestamp}] [${severity}] ${error.name}: ${error.message}`);
-    
+
     if (context.command) {
       console.error(`  Command: ${context.command}`);
     }
@@ -159,13 +155,18 @@ export class ErrorHandler {
     if (context.channelId) {
       console.error(`  Channel: ${context.channelId}`);
     }
-    if (error.cause && typeof error.cause === 'object' && error.cause !== null && 'message' in error.cause) {
+    if (
+      error.cause &&
+      typeof error.cause === 'object' &&
+      error.cause !== null &&
+      'message' in error.cause
+    ) {
       console.error(`  Caused by: ${(error.cause as Error).message}`);
     }
     if (context.additionalData) {
       console.error(`  Additional Data:`, context.additionalData);
     }
-    
+
     console.error(`  Stack: ${error.stack}`);
   }
 
@@ -175,26 +176,26 @@ export class ErrorHandler {
   private async sendErrorResponse(interaction: CommandInteraction, error: BotError): Promise<void> {
     try {
       const embed = new EmbedBuilder()
-        .setTitle("❌ Error Occurred")
-        .setColor("#ff0000")
-        .setDescription("An unexpected error occurred while processing your request.")
+        .setTitle('❌ Error Occurred')
+        .setColor('#ff0000')
+        .setDescription('An unexpected error occurred while processing your request.')
         .addFields(
-          { name: "Error Type", value: error.name, inline: true },
-          { name: "Severity", value: error.severity, inline: true }
+          { name: 'Error Type', value: error.name, inline: true },
+          { name: 'Severity', value: error.severity, inline: true }
         )
         .setTimestamp();
 
       // Add more details for development
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV === 'development') {
         embed.addFields(
-          { name: "Message", value: error.message, inline: false },
-          { name: "Command", value: error.context.command || "Unknown", inline: true }
+          { name: 'Message', value: error.message, inline: false },
+          { name: 'Command', value: error.context.command || 'Unknown', inline: true }
         );
       }
 
       await interaction.reply({ embeds: [embed], ephemeral: true });
     } catch (replyError) {
-      console.error("Failed to send error response:", replyError);
+      console.error('Failed to send error response:', replyError);
     }
   }
 
@@ -202,13 +203,13 @@ export class ErrorHandler {
    * Check if error rate limit is exceeded
    */
   private isErrorRateLimited(error: BotError): boolean {
-    const key = `${error.context.command || "unknown"}-${error.context.userId || "unknown"}`;
+    const key = `${error.context.command || 'unknown'}-${error.context.userId || 'unknown'}`;
     const now = Date.now();
     const oneMinuteAgo = now - 60000;
-    
+
     // Clean old entries
-    this.errorCount.forEach((count, errorKey) => {
-      if (errorKey.includes("-") && parseInt(errorKey.split("-")[0]) < oneMinuteAgo) {
+    this.errorCount.forEach((_count, errorKey) => {
+      if (errorKey.includes('-') && parseInt(errorKey.split('-')[0]) < oneMinuteAgo) {
         this.errorCount.delete(errorKey);
       }
     });
@@ -222,10 +223,7 @@ export class ErrorHandler {
   /**
    * Wrap async functions with error handling
    */
-  public async wrapAsync<T>(
-    fn: () => Promise<T>,
-    context?: ErrorContext
-  ): Promise<T | null> {
+  public async wrapAsync<T>(fn: () => Promise<T>, context?: ErrorContext): Promise<T | null> {
     try {
       return await fn();
     } catch (error) {
@@ -251,7 +249,7 @@ export class ErrorHandler {
           guildId: interaction.guildId || undefined,
           channelId: interaction.channelId,
         };
-        
+
         await this.handleError(error as Error, interaction, context);
       }
     };
@@ -267,21 +265,21 @@ export const errorHandler = ErrorHandler.getInstance();
  * Setup global error handlers
  */
 export function setupGlobalErrorHandlers(): void {
-  process.on("unhandledRejection", (reason, promise) => {
+  process.on('unhandledRejection', (reason, promise) => {
     errorHandler.handleUnhandledRejection(reason, promise);
   });
 
-  process.on("uncaughtException", (error) => {
+  process.on('uncaughtException', (error) => {
     errorHandler.handleUncaughtException(error);
   });
 
-  process.on("SIGTERM", () => {
-    console.log("Received SIGTERM, shutting down gracefully...");
+  process.on('SIGTERM', () => {
+    console.log('Received SIGTERM, shutting down gracefully...');
     process.exit(0);
   });
 
-  process.on("SIGINT", () => {
-    console.log("Received SIGINT, shutting down gracefully...");
+  process.on('SIGINT', () => {
+    console.log('Received SIGINT, shutting down gracefully...');
     process.exit(0);
   });
 }
@@ -308,12 +306,12 @@ export async function safeDatabaseOperation<T>(
     return await operation();
   } catch (error) {
     const botError = new BotError(
-      "Database operation failed",
+      'Database operation failed',
       ErrorSeverity.HIGH,
       context,
       error as Error
     );
-    
+
     // Use the public handleError method instead of private logError
     await errorHandler.handleError(botError);
     return null;
@@ -323,28 +321,29 @@ export async function safeDatabaseOperation<T>(
 /**
  * Send error log to a Discord channel if configured
  */
-export async function sendErrorToChannel(
-  client: Client,
-  error: BotError
-): Promise<void> {
+export async function sendErrorToChannel(client: Client, error: BotError): Promise<void> {
   const channelId = process.env.ERROR_LOG_CHANNEL_ID;
   if (!channelId) return;
   try {
     const channel = await client.channels.fetch(channelId);
-    if (channel && channel.isTextBased()) {
+    if (channel?.isTextBased()) {
       const embed = new EmbedBuilder()
-        .setTitle("❌ Bot Error Occurred")
-        .setColor("#ff0000")
+        .setTitle('❌ Bot Error Occurred')
+        .setColor('#ff0000')
         .addFields(
-          { name: "Type", value: error.name, inline: true },
-          { name: "Severity", value: error.severity, inline: true },
-          { name: "Message", value: error.message, inline: false },
-          { name: "Context", value: JSON.stringify(error.context, null, 2).slice(0, 1000) || "None", inline: false }
+          { name: 'Type', value: error.name, inline: true },
+          { name: 'Severity', value: error.severity, inline: true },
+          { name: 'Message', value: error.message, inline: false },
+          {
+            name: 'Context',
+            value: JSON.stringify(error.context, null, 2).slice(0, 1000) || 'None',
+            inline: false,
+          }
         )
         .setTimestamp();
       await (channel as TextChannel).send({ embeds: [embed] });
     }
   } catch (err) {
-    console.error("Failed to send error to log channel:", err);
+    console.error('Failed to send error to log channel:', err);
   }
-} 
+}
