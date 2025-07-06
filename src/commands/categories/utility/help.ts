@@ -64,11 +64,14 @@ async function buildCommandsList(category: string, client: Client): Promise<stri
     );
 
     const commandIds = await getCommandIds(client);
+    console.log(commandIds);
     return filteredCommands
         .map((cmd) => {
             const commandId = commandIds[cmd.name];
+            console.log(cmd.name, commandId);
             // Use Discord's command mention format if we have the ID, otherwise just capitalize
             const commandMention = commandId ? `</${cmd.name}:${commandId}>` : capitalise(cmd.name);
+            console.log(commandMention);
             return `> 🔹 **${commandMention}**\n> \u200b \u200b \u200b *${cmd.description}*`;
         })
         .join('\n');
