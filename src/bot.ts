@@ -16,7 +16,7 @@ export const bot = new Client({
   ],
 
   // Debug logs are disabled in silent mode
-  silent: false,
+  silent: true,
 
   // Configuration for @SimpleCommand
   simpleCommand: {
