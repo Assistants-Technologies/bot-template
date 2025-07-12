@@ -42,6 +42,8 @@ export class Common {
 
   // Synchronize applications commands with Discord
   void bot.initApplicationCommands();
+  
+  // await bot.application?.commands.set([]);
 
   // To clear all guild commands, uncomment this line,
   // This is useful when moving from guild commands to global commands

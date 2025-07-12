@@ -32,6 +32,7 @@ export async function getCommandIds(client: Client): Promise<Record<string, stri
         try {
             const globalCommands = await client.application.commands.fetch();
             for (const cmd of globalCommands.values()) {
+                console.log(cmd.name, cmd.id);
                 commandIds.set(cmd.name, cmd.id);
             }
         } catch (error) {
@@ -44,6 +45,7 @@ export async function getCommandIds(client: Client): Promise<Record<string, stri
         try {
             const guildCommands = await guild.commands.fetch();
             for (const cmd of guildCommands.values()) {
+                console.log(cmd.name, cmd.id);
                 commandIds.set(cmd.name, cmd.id);
             }
         } catch (error) {
